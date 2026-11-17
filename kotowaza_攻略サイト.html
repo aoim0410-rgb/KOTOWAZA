@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ことわざ攻略</title>
+<style>
+:root{--bg:#f4f7fb;--panel:#fff;--ink:#182235;--muted:#65738a;--blue:#2563eb;--line:#e2e8f0;--good:#15803d;--bad:#dc2626}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#eff6ff,#f8fafc 48%,#fff1f2);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif}
+header{padding:26px 18px 18px;text-align:center}h1{margin:0;font-size:clamp(25px,5vw,36px);letter-spacing:.04em}header p{margin:8px 0 0;color:var(--muted)}
+main{max-width:920px;margin:auto;padding:0 14px 50px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0 18px}.stat,.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:0 5px 18px #1e293b0b}.stat{padding:13px;text-align:center}.stat b{display:block;font-size:24px;color:var(--blue)}.stat span{font-size:12px;color:var(--muted)}
+nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.tab,button{border:0;border-radius:12px;padding:11px 15px;font-weight:700;font-size:14px;cursor:pointer}.tab{background:#e8eef8;color:#34445c}.tab.active{background:var(--blue);color:white}
+.panel{padding:18px;margin-bottom:14px}.hidden{display:none!important}.muted{color:var(--muted)}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.row>*{flex:1}.primary{background:var(--blue);color:white}.secondary{background:#eaf0fa;color:#26364f}.danger{background:#fff0f0;color:#b91c1c}button:disabled{opacity:.45;cursor:not-allowed}
+select,input{width:100%;padding:12px;border:1px solid var(--line);border-radius:11px;background:white;color:var(--ink);font-size:15px}.field{margin:10px 0}.field label{display:block;font-size:13px;color:var(--muted);margin:0 0 6px}
+.question{font-size:clamp(21px,4vw,29px);font-weight:800;line-height:1.55;margin:18px 0;text-align:center;white-space:pre-wrap}.qmeta{text-align:center;color:var(--muted);font-size:13px}.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}.choice{background:#f8fafc;border:1px solid var(--line);text-align:left;min-height:64px;line-height:1.45;color:var(--ink)}.choice.correct{background:#dcfce7;border:2px solid #22c55e}.choice.wrong{background:#fee2e2;border:2px solid #ef4444}
+.feedback{padding:13px;border-radius:12px;margin-top:13px;line-height:1.6}.feedback.ok{background:#ecfdf5;color:#166534}.feedback.ng{background:#fff1f2;color:#9f1239}
+.progress{height:9px;background:#e8edf5;border-radius:99px;overflow:hidden;margin:10px 0}.progress>div{height:100%;background:linear-gradient(90deg,#2563eb,#ec4899);width:0}
+.listhead{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}.items{display:grid;gap:8px;margin-top:12px}.item{border:1px solid var(--line);border-radius:13px;padding:12px;display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;background:#fff}.item input{width:19px;height:19px;margin-top:3px;accent-color:var(--blue)}.item strong{display:block;margin-bottom:4px}.item p{margin:0;color:#536176;font-size:14px;line-height:1.55}.item.done{background:#f0fdf4}.item.done strong{text-decoration:line-through;color:#64748b}.small{font-size:12px;color:var(--muted)}
+@media(max-width:560px){.choices{grid-template-columns:1fr}.stats{gap:7px}.stat{padding:10px 4px}.stat b{font-size:21px}.panel{padding:14px}.tab{flex:1;padding:10px 7px}}
+</style>
+</head>
+<body>
+<header><h1>ことわざ攻略</h1><p>意味を知る。思い出す。使いこなす。</p></header>
+<main>
+ <section class="stats">
+  <div class="stat"><b id="total">0</b><span>収録ことわざ</span></div>
+  <div class="stat"><b id="learned">0</b><span>覚えたチェック</span></div>
+  <div class="stat"><b id="rate">0%</b><span>テスト正答率</span></div>
+ </section>
+ <nav>
+  <button class="tab active" data-tab="quiz">4択テスト</button>
+  <button class="tab" data-tab="list">一覧・チェック</button>
+ </nav>
+ <section id="quiz">
+  <div class="panel">
+   <div class="row">
+    <div class="field"><label for="direction">出題方向</label><select id="direction"><option value="m2p">意味 → ことわざ</option><option value="p2m">ことわざ → 意味</option></select></div>
+    <div class="field"><label for="scope">出題範囲</label><select id="scope"><option value="all">すべて</option><option value="unlearned">未チェックのみ</option><option value="learned">チェック済みのみ</option></select></div>
+   </div>
+   <button class="primary" id="start" style="width:100%">テストを始める</button>
+  </div>
+  <div class="panel hidden" id="quizbox">
+   <div class="qmeta" id="counter">1 / 10</div><div class="progress"><div id="bar"></div></div>
+   <div class="question" id="question"></div>
+   <div class="choices" id="choices"></div>
+   <div id="feedback" class="hidden"></div>
+   <div class="row" style="margin-top:14px"><button class="secondary" id="quit">中断する</button><button class="primary" id="next" disabled>次の問題</button></div>
+  </div>
+  <div class="panel hidden" id="result">
+   <h2 style="text-align:center">テスト終了！</h2><div class="question" id="resultscore"></div><p id="resulttext" class="muted" style="text-align:center"></p>
+   <button class="primary" id="again" style="width:100%">もう一度テストする</button>
+  </div>
+ </section>
+ <section id="list" class="hidden">
+  <div class="panel">
+   <div class="listhead"><strong>ことわざ一覧</strong><span class="small" id="listcount"></span></div>
+   <div class="field"><input id="search" placeholder="ことわざ・意味から検索…"></div>
+   <div class="row">
+    <button class="secondary" id="showall">すべて表示</button>
+    <button class="secondary" id="showunchecked">未チェックだけ</button>
+    <button class="secondary" id="reset">チェックをリセット</button>
+   </div>
+   <p class="small">チェックはこの端末のブラウザに保存されます。</p>
+   <div class="items" id="items"></div>
+ </div>
+ </section>
+ <p class="small" style="text-align:center">※意味は写真の説明をもとに、テスト用に短く整理しています。</p>
+</main>
+<script>
+const DATA = [{"p": "悪事千里を走る", "m": "悪いことは、すぐに世間に知れ渡るということ。"}, {"p": "早起きは三文の徳", "m": "朝早く起きると、何かしらよいことがあるということ。"}, {"p": "頭隠して尻隠さず", "m": "一部分を隠しただけで、全体を隠したつもりになっていること。"}, {"p": "あばたもえくぼ", "m": "好きな相手のことは、欠点も長所のように見えるということ。"}, {"p": "二兎を追う者は一兎をも得ず", "m": "二つのものを同時に得ようとすると、どちらも得られないことがあるということ。"}, {"p": "雨降って地固まる", "m": "もめごとのあと、かえって物事がよい状態になること。"}, {"p": "けんかするほど仲がよい", "m": "けんかをするほど、かえって親しい間柄であるということ。"}, {"p": "案ずるより産むが易し", "m": "心配しているより、実際にやってみると案外たやすくできるということ。"}, {"p": "石の上にも三年", "m": "つらくても辛抱してがんばれば、いつかは報われるということ。"}, {"p": "石橋をたたいて渡る", "m": "非常に用心深いこと。"}, {"p": "急がば回れ", "m": "危険な近道より、遠回りでも安全な道を選ぶほうが早く目的地に着くということ。"}, {"p": "一を聞いて十を知る", "m": "ごく一部を聞いただけで、全体がわかるほど非常に賢いこと。"}, {"p": "犬も歩けば棒に当たる", "m": "積極的に行動すると、思わぬ幸運や災難にあうこと。"}, {"p": "井の中の蛙大海を知らず", "m": "自分の知識だけがすべてだと思い、ほかに広い世界があるのを知らないこと。"}, {"p": "言わぬが花", "m": "言葉ではっきり言わないほうが、かえって味わいがあるということ。"}, {"p": "嘘から出たまこと", "m": "嘘や冗談で言ったつもりのことが、実際に本当のことになってしまうこと。"}, {"p": "馬の耳に念仏", "m": "意見や忠告などをいくら言っても、全く気にせず聞き入れないこと。"}, {"p": "親の心子知らず", "m": "子どもは、親の気持ちをなかなか理解しないものだということ。"}, {"p": "親の光は七光", "m": "親の地位や名声のおかげで、子どもがよい恩恵を受けること。"}, {"p": "親はなくとも子は育つ", "m": "実の親がいなくても、子どもはなんとか育つものだということ。"}, {"p": "終わりよければすべてよし", "m": "途中に何があっても、最後がよければすべてよいということ。"}, {"p": "負うた子に教えられて浅瀬を渡る", "m": "年少で経験の少ない者にも、物事を教えられることがあるということ。"}, {"p": "鬼に金棒", "m": "強い者がさらに強くなること。"}, {"p": "鬼の居ぬ間に洗濯", "m": "怖い人やうるさい人がいないすきに、くつろぐこと。"}, {"p": "鬼の目にも涙", "m": "冷酷な人でも、時には情に負けて優しい態度をとることがあるということ。"}, {"p": "帯に短したすきに長し", "m": "中途半端で、何かに使うには都合が悪いこと。"}, {"p": "蛙の子は蛙", "m": "凡人の子は、やはり凡人であるということ。"}, {"p": "蛙の面に水", "m": "どんなことをされても平気でいること。"}, {"p": "枯れ木も山のにぎわい", "m": "つまらないものでも、ないよりはましであるということ。"}, {"p": "かわいい子には旅をさせよ", "m": "子どもをかわいいと思うなら、将来のために苦労をさせたほうがよいということ。"}, {"p": "窮鼠猫を噛む", "m": "追いつめられると、弱い者でも強い者に反撃して苦しめることがあるということ。"}, {"p": "木を見て森を見ず", "m": "部分にこだわって、全体を見ていないこと。"}, {"p": "臭いものに蓋をする", "m": "悪いことが世間に知られないように、一時しのぎの手段で隠すこと。"}, {"p": "腐っても鯛", "m": "すぐれたものは、衰えても値打ちがあるということ。"}, {"p": "口は災いの元", "m": "不用意な言葉は災難を招くので、ものを言うときには気をつけるべきだということ。"}, {"p": "けがの功名", "m": "失敗や災難と思っていたことや何気なくやったことが、意外にもよい結果を生むこと。"}, {"p": "光陰矢のごとし", "m": "月日のたつのは、矢が飛ぶ早さのように速いということ。"}, {"p": "後悔先に立たず", "m": "済んでしまったことをいくら悔やんでも、取り返しがつかないということ。"}, {"p": "郷に入っては郷に従え", "m": "ある土地に住むようになったら、その土地の習慣に従うのがよいということ。"}, {"p": "転ばぬ先の杖", "m": "失敗する前に用心しておくのがよいということ。"}, {"p": "地獄の沙汰も金次第", "m": "この世の中では、何事も金の力でどうにかなることがあるということ。"}, {"p": "親しき中にも礼儀あり", "m": "どんなに親しい間柄でも、礼儀を失わないようにするべきだということ。"}, {"p": "釈迦に説法", "m": "その道をよく知っている人に、それを教えるようなこと。"}, {"p": "朱に交われば赤くなる", "m": "人はつきあう相手次第で、よくなったり悪くなったりするということ。"}, {"p": "知らぬが仏", "m": "知らなければ腹を立てることもなく、平気でいられるということ。"}, {"p": "好きこそものの上手なれ", "m": "好きなことは進んで努力するので、上達するものだということ。"}, {"p": "過ぎたるはなお及ばざるがごとし", "m": "何事も、やりすぎるのは控えめにするのと同じようによくないということ。"}, {"p": "住めば都", "m": "どんな土地でも、住み慣れればよいところに思えるようになるということ。"}, {"p": "背に腹は代えられぬ", "m": "差し迫ったときには、ほかのことを犠牲にしてもしかたがないということ。"}, {"p": "船頭多くして船山に上る", "m": "指図する人が多いために、物事がまとまらず、とんでもない方向へ進んでしまうこと。"}, {"p": "善は急げ", "m": "よいと思ったことは、すぐに実行するのがよいということ。"}, {"p": "袖振り合うも多生の縁", "m": "人と人とのちょっとした出会いも、前世からの深い縁で起こるものだということ。"}, {"p": "立つ鳥跡を濁さず", "m": "立ち去るときは、その場を見苦しくないように始末しておくべきであるということ。"}, {"p": "蓼食う虫も好き好き", "m": "人の好みはいろいろであるということ。"}, {"p": "棚からぼたもち", "m": "思いがけない幸運が転がり込むこと。"}, {"p": "月とすっぽん", "m": "比べものにならないほど違っていること。"}, {"p": "月夜に提灯", "m": "必要のないもの。むだなもの。"}, {"p": "鉄は熱いうちに打て", "m": "人は若く柔軟なときに教育するのが大切であること。また、物事は時機を逃さず実行するべきであること。"}, {"p": "灯台下暗し", "m": "身近なことは、かえって気づきにくいということ。"}, {"p": "年寄りの冷や水", "m": "老人が年齢にふさわしくない無理をすること。"}, {"p": "捕らぬ狸の皮算用", "m": "まだ手に入っていないものを当てにして、あれこれ計画すること。"}, {"p": "出る杭は打たれる", "m": "才能があったり出しゃばったりして目立つ人は、人から非難されたり憎まれたりすることがあるということ。"}, {"p": "虎の威を借る狐", "m": "自分より強い者の力を利用して、威張ること。"}, {"p": "どんぐりの背比べ", "m": "どれも似たり寄ったりで、特にすぐれたものがないこと。"}, {"p": "飛んで火に入る夏の虫", "m": "自分から進んで危険な目にあうこと。"}, {"p": "猫に小判", "m": "価値のあるものでも、その値打ちがわからない人には役に立たないということ。"}, {"p": "猫の手も借りたい", "m": "非常に忙しく、誰でもよいから手伝ってほしいこと。"}, {"p": "ぬかに釘", "m": "手ごたえがなく、効き目がないこと。"}, {"p": "濡れ手で粟", "m": "苦労せずに大きな利益を得ること。"}, {"p": "情けは人のためならず", "m": "人に親切にしておくと、めぐりめぐって自分に返ってくるということ。"}, {"p": "習うより慣れよ", "m": "人から教わるよりも、自分で実際にやって経験を重ねたほうが身につくということ。"}, {"p": "二階から目薬", "m": "思うようにいかず、もどかしいこと。"}, {"p": "憎まれっ子世にはばかる", "m": "人から嫌われるような人のほうが、世間で幅をきかせることがあるということ。"}, {"p": "能ある鷹は爪を隠す", "m": "本当に能力のある人は、それをむやみにひけらかさないということ。"}, {"p": "喉元過ぎれば熱さを忘れる", "m": "苦しいことも、過ぎてしまえばその苦しさを忘れてしまうということ。"}, {"p": "念には念を入れよ", "m": "注意した上にもさらに気をつけること。"}, {"p": "花より団子", "m": "見た目や風流よりも、実際の利益や実用を大切にすること。"}, {"p": "火のないところに煙は立たぬ", "m": "何かしら根拠になる事実やうわさの元がなければ、うわさは立たないということ。"}, {"p": "百聞は一見にしかず", "m": "何度も話を聞くより、一度実際に見るほうがよくわかるということ。"}, {"p": "人の振り見て我が振り直せ", "m": "他人の姿や行いを見て、自分の悪いところを反省し改めるべきだということ。"}, {"p": "下手の横好き", "m": "下手なのに、そのことが好きで熱心にすること。"}, {"p": "仏作って魂入れず", "m": "大切な部分が欠けていて、せっかくのものが完成していないこと。"}, {"p": "仏の顔も三度", "m": "どんなに温厚な人でも、何度もひどいことをされれば怒るということ。"}, {"p": "待てば海路の日和あり", "m": "今はよくない状況でも、待っていればよい時期がきっと来るということ。"}, {"p": "三つ子の魂百まで", "m": "幼いころの性格は、年をとっても変わらないということ。"}, {"p": "昔取った杵柄", "m": "若いころに身につけた技や能力が、年をとっても役立つこと。"}, {"p": "目の上のたんこぶ", "m": "自分より地位や力が上で、何かとじゃまに感じるもの。"}, {"p": "餅は餅屋", "m": "何事も専門家に任せておいたほうがよいということ。"}, {"p": "門前の小僧習わぬ経を読む", "m": "いつも見聞きしていると、習わなくても自然に覚えること。"}, {"p": "焼け石に水", "m": "努力や助けがわずかで、ほとんど効果がないこと。"}, {"p": "安物買いの銭失い", "m": "安いものを買っても、すぐ壊れたりして結局損をすること。"}, {"p": "やぶをつついて蛇を出す", "m": "余計なことをして、災いを招くこと。"}, {"p": "弱り目にたたり目", "m": "不運なときに、さらに災難にあうこと。"}, {"p": "来年のことを言えば鬼が笑う", "m": "未来のことは予測できないということ。"}, {"p": "良薬は口に苦し", "m": "自分のためになる忠告は、聞くのがつらいことがあるということ。"}, {"p": "類は友を呼ぶ", "m": "気の合う者や似た者同士は、自然と集まるということ。"}, {"p": "論より証拠", "m": "議論をするより、実際の証拠を出すほうが確かであるということ。"}, {"p": "渡りに船", "m": "困っているときに、ちょうど都合のよい助けや機会が訪れること。"}, {"p": "笑う門には福来る", "m": "いつも明るく笑いの絶えない家には、自然と幸福が訪れるということ。"}];
+const KEY='kotowaza_progress_v1', SCORE='kotowaza_score_v1';
+let checked=new Set(JSON.parse(localStorage.getItem(KEY)||'[]'));
+let stats=JSON.parse(localStorage.getItem(SCORE)||'{"ok":0,"ng":0}');
+let pool=[],pos=0,correct=0,answered=false,activeFilter='all';
+const $=id=>document.getElementById(id);
+function save(){localStorage.setItem(KEY,JSON.stringify([...checked]));localStorage.setItem(SCORE,JSON.stringify(stats));renderStats()}
+function renderStats(){$('total').textContent=DATA.length;$('learned').textContent=checked.size;$('rate').textContent=(stats.ok+stats.ng?Math.round(stats.ok/(stats.ok+stats.ng)*100):0)+'%'}
+function switchTab(t){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));$('quiz').classList.toggle('hidden',t!=='quiz');$('list').classList.toggle('hidden',t!=='list');if(t==='list')renderList()}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
+function renderList(){
+ const q=$('search').value.trim().toLowerCase();
+ const arr=DATA.filter(x=>(activeFilter==='all'||(activeFilter==='unchecked'?!checked.has(x.p):checked.has(x.p)))&&(!q||(x.p+x.m).toLowerCase().includes(q)));
+ $('listcount').textContent=`${arr.length} / ${DATA.length} 件`;
+ $('items').innerHTML=arr.map(x=>`<label class="item ${checked.has(x.p)?'done':''}"><input type="checkbox" ${checked.has(x.p)?'checked':''} data-p="${esc(x.p)}"><span><strong>${esc(x.p)}</strong><p>${esc(x.m)}</p></span></label>`).join('');
+ $('items').querySelectorAll('input').forEach(c=>c.onchange=()=>{c.checked?checked.add(c.dataset.p):checked.delete(c.dataset.p);save();renderList()});
+}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+$('search').oninput=renderList;
+$('showall').onclick=()=>{activeFilter='all';renderList()};
+$('showunchecked').onclick=()=>{activeFilter='unchecked';renderList()};
+$('reset').onclick=()=>{if(confirm('チェックをすべてリセットしますか？')){checked.clear();save();renderList()}};
+function start(){
+ let s=$('scope').value;pool=DATA.filter(x=>s==='all'||(s==='unlearned'?!checked.has(x.p):checked.has(x.p)));
+ if(pool.length<4){alert('4択問題を作るには、出題範囲に4件以上必要です。');return}
+ pool=pool.slice().sort(()=>Math.random()-.5);pos=0;correct=0;
+ $('result').classList.add('hidden');$('quizbox').classList.remove('hidden');showQ();
+}
+$('start').onclick=start;$('again').onclick=start;
+function showQ(){
+ answered=false;$('feedback').className='hidden';$('feedback').textContent='';$('next').disabled=true;
+ const x=pool[pos],dir=$('direction').value;
+ $('counter').textContent=`${pos+1} / ${pool.length}`;$('bar').style.width=(pos/pool.length*100)+'%';
+ $('question').textContent=dir==='m2p'?x.m:x.p;
+ const answer=dir==='m2p'?x.p:x.m;
+ let opts=[answer];
+ while(opts.length<4){let candidate=pool[Math.floor(Math.random()*pool.length)];let val=dir==='m2p'?candidate.p:candidate.m;if(!opts.includes(val))opts.push(val)}
+ if(opts.length<4)for(const c of DATA){let val=dir==='m2p'?c.p:c.m;if(!opts.includes(val))opts.push(val);if(opts.length===4)break}
+ opts.sort(()=>Math.random()-.5);
+ $('choices').innerHTML=opts.map((v,i)=>`<button class="choice" data-v="${esc(v)}">${i+1}. ${esc(v)}</button>`).join('');
+ $('choices').querySelectorAll('button').forEach(b=>b.onclick=()=>choose(b,answer,x,dir));
+}
+function choose(btn,answer,x,dir){
+ if(answered)return;answered=true;let ok=btn.dataset.v===answer;
+ if(ok){correct++;stats.ok++}else stats.ng++;save();
+ $('choices').querySelectorAll('button').forEach(b=>{b.disabled=true;if(b.dataset.v===answer)b.classList.add('correct');else if(b===btn)b.classList.add('wrong')});
+ let f=$('feedback');f.className='feedback '+(ok?'ok':'ng');f.textContent=(ok?'正解！':'不正解。正解は「'+answer+'」')+'\\n'+(dir==='m2p'?x.p+'：'+x.m:x.m);
+ $('next').disabled=false;$('next').textContent=pos===pool.length-1?'結果を見る':'次の問題';
+}
+$('next').onclick=()=>{if(!answered)return;pos++;if(pos>=pool.length){$('quizbox').classList.add('hidden');$('result').classList.remove('hidden');$('resultscore').textContent=`${correct} / ${pool.length} 問正解`;let pct=Math.round(correct/pool.length*100);$('resulttext').textContent=`正答率 ${pct}%　｜　${pct===100?'全問正解！見事！':pct>=80?'かなり身についているぞ！':'間違えた問題を一覧で復習してみよう。'}`;$('bar').style.width='100%'}else showQ()};
+$('quit').onclick=()=>{$('quizbox').classList.add('hidden');$('result').classList.add('hidden')};
+renderStats();
+</script>
+</body></html>
