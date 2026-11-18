@@ -6,16 +6,17 @@
 <title>ことわざ攻略</title>
 <style>
 :root{--bg:#f4f7fb;--panel:#fff;--ink:#182235;--muted:#65738a;--blue:#2563eb;--line:#e2e8f0;--good:#15803d;--bad:#dc2626}
-*{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#eff6ff,#f8fafc 48%,#fff1f2);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#eff6ff,#f8fafc 48%,#fff1f2);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif;font-size:17px}
 header{padding:26px 18px 18px;text-align:center}h1{margin:0;font-size:clamp(25px,5vw,36px);letter-spacing:.04em}header p{margin:8px 0 0;color:var(--muted)}
-main{max-width:920px;margin:auto;padding:0 14px 50px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0 18px}.stat,.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:0 5px 18px #1e293b0b}.stat{padding:13px;text-align:center}.stat b{display:block;font-size:24px;color:var(--blue)}.stat span{font-size:12px;color:var(--muted)}
-nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.tab,button{border:0;border-radius:12px;padding:11px 15px;font-weight:700;font-size:14px;cursor:pointer}.tab{background:#e8eef8;color:#34445c}.tab.active{background:var(--blue);color:white}
+main{max-width:920px;margin:auto;padding:0 14px 50px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0 18px}.stat,.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:0 5px 18px #1e293b0b}.stat{padding:13px;text-align:center}.stat b{display:block;font-size:24px;color:var(--blue)}.stat span{font-size:14px;color:var(--muted)}
+nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.tab,button{border:0;border-radius:12px;padding:11px 15px;font-weight:700;font-size:16px;cursor:pointer}.tab{background:#e8eef8;color:#34445c}.tab.active{background:var(--blue);color:white}
 .panel{padding:18px;margin-bottom:14px}.hidden{display:none!important}.muted{color:var(--muted)}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.row>*{flex:1}.primary{background:var(--blue);color:white}.secondary{background:#eaf0fa;color:#26364f}.danger{background:#fff0f0;color:#b91c1c}button:disabled{opacity:.45;cursor:not-allowed}
-select,input{width:100%;padding:12px;border:1px solid var(--line);border-radius:11px;background:white;color:var(--ink);font-size:15px}.field{margin:10px 0}.field label{display:block;font-size:13px;color:var(--muted);margin:0 0 6px}
-.question{font-size:clamp(21px,4vw,29px);font-weight:800;line-height:1.55;margin:18px 0;text-align:center;white-space:pre-wrap}.qmeta{text-align:center;color:var(--muted);font-size:13px}.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}.choice{background:#f8fafc;border:1px solid var(--line);text-align:left;min-height:64px;line-height:1.45;color:var(--ink)}.choice.correct{background:#dcfce7;border:2px solid #22c55e}.choice.wrong{background:#fee2e2;border:2px solid #ef4444}
+select,input{width:100%;padding:12px;border:1px solid var(--line);border-radius:11px;background:white;color:var(--ink);font-size:17px}.field{margin:10px 0}.field label{display:block;font-size:15px;color:var(--muted);margin:0 0 6px}
+.quiz-check{display:flex;align-items:center;justify-content:center;gap:9px;margin:0 auto 16px;padding:10px 14px;width:fit-content;border:1px solid var(--line);border-radius:12px;background:#f8fafc;color:var(--muted);font-size:16px;cursor:pointer}.quiz-check input{width:18px;height:18px;accent-color:var(--blue)}
+.question{font-size:clamp(21px,4vw,29px);font-weight:800;line-height:1.55;margin:18px 0;text-align:center;white-space:pre-wrap}.qmeta{text-align:center;color:var(--muted);font-size:15px}.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}.choice{background:#f8fafc;border:1px solid var(--line);text-align:left;min-height:72px;line-height:1.55;color:var(--ink);font-size:17px;padding:15px}.choice.correct{background:#dcfce7;border:2px solid #22c55e}.choice.wrong{background:#fee2e2;border:2px solid #ef4444}
 .feedback{padding:13px;border-radius:12px;margin-top:13px;line-height:1.6}.feedback.ok{background:#ecfdf5;color:#166534}.feedback.ng{background:#fff1f2;color:#9f1239}
 .progress{height:9px;background:#e8edf5;border-radius:99px;overflow:hidden;margin:10px 0}.progress>div{height:100%;background:linear-gradient(90deg,#2563eb,#ec4899);width:0}
-.listhead{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}.items{display:grid;gap:8px;margin-top:12px}.item{border:1px solid var(--line);border-radius:13px;padding:12px;display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;background:#fff}.item input{width:19px;height:19px;margin-top:3px;accent-color:var(--blue)}.item strong{display:block;margin-bottom:4px}.item p{margin:0;color:#536176;font-size:14px;line-height:1.55}.item.done{background:#f0fdf4}.item.done strong{text-decoration:line-through;color:#64748b}.small{font-size:12px;color:var(--muted)}
+.listhead{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}.items{display:grid;gap:8px;margin-top:12px}.item{border:1px solid var(--line);border-radius:13px;padding:12px;display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;background:#fff}.item strong{font-size:17px}.item input{width:21px;height:19px;margin-top:3px;accent-color:var(--blue)}.item strong{display:block;margin-bottom:4px}.item p{margin:0;color:#536176;font-size:16px;line-height:1.55}.item.done{background:#f0fdf4}.item.done strong{text-decoration:line-through;color:#64748b}.small{font-size:14px;color:var(--muted)}
 @media(max-width:560px){.choices{grid-template-columns:1fr}.stats{gap:7px}.stat{padding:10px 4px}.stat b{font-size:21px}.panel{padding:14px}.tab{flex:1;padding:10px 7px}}
 </style>
 </head>
@@ -24,7 +25,7 @@ select,input{width:100%;padding:12px;border:1px solid var(--line);border-radius:
 <main>
  <section class="stats">
   <div class="stat"><b id="total">0</b><span>収録ことわざ</span></div>
-  <div class="stat"><b id="learned">0</b><span>覚えたチェック</span></div>
+  <div class="stat"><b id="learned">0</b><span>チェックをつけた数</span></div>
   <div class="stat"><b id="rate">0%</b><span>テスト正答率</span></div>
  </section>
  <nav>
@@ -42,6 +43,7 @@ select,input{width:100%;padding:12px;border:1px solid var(--line);border-radius:
   <div class="panel hidden" id="quizbox">
    <div class="qmeta" id="counter">1 / 10</div><div class="progress"><div id="bar"></div></div>
    <div class="question" id="question"></div>
+   <label class="quiz-check"><input type="checkbox" id="questionCheck"> このことわざにチェックをつける</label>
    <div class="choices" id="choices"></div>
    <div id="feedback" class="hidden"></div>
    <div class="row" style="margin-top:14px"><button class="secondary" id="quit">中断する</button><button class="primary" id="next" disabled>次の問題</button></div>
@@ -101,6 +103,8 @@ function showQ(){
  const x=pool[pos],dir=$('direction').value;
  $('counter').textContent=`${pos+1} / ${pool.length}`;$('bar').style.width=(pos/pool.length*100)+'%';
  $('question').textContent=dir==='m2p'?x.m:x.p;
+ $('questionCheck').checked=checked.has(x.p);
+ $('questionCheck').onchange=()=>{ $('questionCheck').checked?checked.add(x.p):checked.delete(x.p); save(); };
  const answer=dir==='m2p'?x.p:x.m;
  let opts=[answer];
  while(opts.length<4){let candidate=pool[Math.floor(Math.random()*pool.length)];let val=dir==='m2p'?candidate.p:candidate.m;if(!opts.includes(val))opts.push(val)}
